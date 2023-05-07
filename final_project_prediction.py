@@ -26,12 +26,12 @@ model_mode = st.sidebar.selectbox('📈 Select Prediction Model', ['Logistic Reg
 
 ### Dataframe cleaning - encode categorical variables to numerical
 df = pd.read_csv("df.csv")
-categorical_columns = ['hotel','meal', 'arrival_date_year', 'arrival_date_month', 'country', 'market_segment', 'distribution_channel', 'deposit_type', 'customer_type', 'reservation_status']
+categorical_columns = ['hotel','meal', 'arrival_date_year', 'arrival_date_month', 'country', 'market_segment', 'distribution_channel', 'deposit_type', 'customer_type']
 for col in categorical_columns:
     encoder = LabelEncoder()
     df[col] = encoder.fit_transform(df[col])
 df.dropna()
-columns_to_drop = ['company', 'reservation_status_date', 'reserved_room_type', 'arrival_date_day_of_month', 'assigned_room_type']
+columns_to_drop = ['company', 'reservation_status_date', 'reserved_room_type', 'arrival_date_day_of_month', 'assigned_room_type', 'reservation_status']
 df.drop(columns = columns_to_drop, inplace=True)
 
 column_labels = {'hotel': 'Hotel Type',
@@ -59,8 +59,7 @@ column_labels = {'hotel': 'Hotel Type',
                 'customer_type': 'Customer Type',
                 'adr': 'ADR',
                 'required_car_parking_spaces': 'Required Car Parking Spaces',
-                'total_of_special_requests': 'Total of Special Requests',
-                'reservation_status_date': 'Reservation Status Date'}
+                'total_of_special_requests': 'Total of Special Requests'}
 
 df = df.rename(columns=column_labels)
 
@@ -83,13 +82,11 @@ if model_mode == 'Logistic Regression':
     X =  df_explanatory
     y = df[selected_dependent]
 
+    start_time = timeit.default_timer()
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size= train_size, random_state= 42)
-
     log_model = LogisticRegression()
     log_model.fit(X_train, y_train)
-
     y_pred = log_model.predict(X_test)
-    
     
     # Display model accuracy
     accuracy = accuracy_score(y_test, y_pred)
@@ -232,6 +229,7 @@ else:
     X =  df_explanatory
     y = df[selected_dependent]
 
+    start_time = timeit.default_timer()
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size= train_size, random_state= 42)
     knn = KNeighborsClassifier(n_neighbors = k_parameter, metric=distance_metric)
     knn.fit(X_train,y_train)
@@ -365,7 +363,6 @@ else:
 
 ## Performance metrics
 st.write('#### 🚀 Execution Time:')
-start_time = timeit.default_timer()
 end_time = timeit.default_timer()
 elapsed_time = end_time - start_time
 st.success(f'{elapsed_time:.4f} seconds')
@@ -375,7 +372,6 @@ tracker = OfflineEmissionsTracker(country_iso_code="FRA") # FRA = France
 tracker.start()
 results = tracker.stop()
 st.success('%.12f kWh' % results)
-
 
 
 
